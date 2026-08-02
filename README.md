@@ -16,20 +16,23 @@ silently rewritten. This mirror makes any rewrite detectable by anyone.
 | `journal.jsonl` | Full journal export — one JSON event per line, ascending `seq`, each row carries `prevHash`/`rowHash` |
 | `head.json` | Chain head snapshot: `{seq, rowHash, count, genesis, exportedAt}` |
 | `ots/<date>-head.json.ots` | Daily OpenTimestamps proof of that day's `head.json` |
+| `verify.mjs` | Standalone verifier — zero dependencies, everything it needs is in this repo |
 
-## Verify it yourself
+## Verify it yourself — no access to our code or database needed
 
-**1. The chain is internally consistent** (no row edited/deleted since export):
+**1. The chain is internally consistent** (no row edited or deleted since export):
 
 ```bash
-git clone https://github.com/Promioz/RK  # or use the snippet below
-npx tsx ReviewCasino/scripts/verify-journal.ts --file journal.jsonl
+git clone https://github.com/Promioz/reviewcasino-transparency
+cd reviewcasino-transparency
+node verify.mjs
 ```
 
-The chain rule, in ~10 lines (independent of our code):
-each row must satisfy `rowHash == sha256(canonicalJson(core) + prevHash)`,
-where `prevHash` equals the previous row's `rowHash` and the first row chains
-from `sha256("rc-genesis-2026")`. Canonical JSON key order:
+`verify.mjs` is ~60 lines with no dependencies — read it before you run it.
+The chain rule it checks: each row must satisfy
+`rowHash == sha256(canonicalJson(core) + prevHash)`, where `prevHash` equals
+the previous row's `rowHash` and the first row chains from
+`sha256("rc-genesis-2026")`. Canonical JSON key order:
 `seq, entityType, entityId, field, oldValue, newValue, actorRole, reason, createdAt`.
 
 **2. The history existed at the anchored date** (not fabricated later):
@@ -39,8 +42,9 @@ pip install opentimestamps-client
 ots verify ots/<date>-head.json.ots -f head.json
 ```
 
-**3. The published journal matches the live site** — the head hash shown on
-<https://www.reviewcasino.com/how-we-rank> must equal `head.json`'s `rowHash`.
+**3. The published journal matches the live site** — the chain head shown on
+<https://www.reviewcasino.com/how-we-rank#score-journal> must equal
+`head.json`'s `rowHash`.
 
 ## Honesty notes
 
@@ -50,3 +54,6 @@ ots verify ots/<date>-head.json.ots -f head.json
   (`editorial` / `system` / `migration`), never a user identity.
 - A missing daily anchor means that day's run failed (calendars down, CI issue)
   — the previous anchor still bounds the history. We do not backfill anchors.
+- Everything in this repository except this README and `verify.mjs` is written
+  by the daily anchor job; those two files are synced from the main codebase by
+  the same job.

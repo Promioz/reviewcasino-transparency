@@ -3,5 +3,11 @@
   "rowHash": "a3b43268cf2a469ac9e82b28d10109299ecf318456ab30e23ddb3219da47ecfc",
   "count": 0,
   "genesis": "a3b43268cf2a469ac9e82b28d10109299ecf318456ab30e23ddb3219da47ecfc",
-  "exportedAt": "2026-08-10T05:59:16.658Z"
+  "exportedAt": "2026-08-11T05:39:29.441Z",
+  "atomLog": {
+    "root": "d7df1d0d60e9989377740ef947c836fac08464826bee29d6025fa164f9434ccb",
+    "seq": 0,
+    "weightsVersion": 4,
+    "algoHash": "9a4832851f61e6b3c79d11397053780edd744c2a9d743aac02ef30ad2f50ec9a"
+  }
 }
